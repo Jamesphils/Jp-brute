@@ -3,71 +3,84 @@ from bs4 import BeautifulSoup
 import re
 import os
 
-# Clear the terminal
+# Clear screen
 os.system('cls' if os.name == 'nt' else 'clear')
 
-# Print the title
-print("*" * 50)
-print("*                    JP-Brute                    *")
-print("*" * 50)
-print("Creator: James Phillips")
-print("Status: Free")
-print("Creation Date: December 4")
+# Colored Thick JP‑BRUTE ASCII Header
+print("\033[1;92m")  # Bold Green
+print("######################################################")
+print("#####   ######   ########   #####   #####   ##########")
+print("#####   ######   ########   #####   #####   ##   #####")
+print("#####   ##       ##         ## ##   ## ##   ##   #####")
+print("#####   ######   #######    ##  ##  ##  ##  ##########")
+print("#####   ##       ##         ##   ## ##   ## ##   ##  #")
+print("#####   ##       ##         ##    ####    ## ##    ## #")
+print("#####   ##       ########   ##     ##     ## ##     ###")
+print("######################################################")
+print("\033[0m")  # Reset color
+
+print("\033[1;94mCreator:\033[0m James Phillips")
+print("\033[1;94mStatus:\033[0m Free Project")
+print("\033[1;94mCreation Date:\033[0m December 4")
 print()
 
-# Menu
-print("[1] Ping Website          [2] Web Scraping")
-print("[3] Web Email Scraping   [4] Web Number Scraping")
+print("\033[1;93m[1] Website Status (Ping)\033[0m")
+print("\033[1;93m[2] Web Page Text (Scrape)\033[0m")
+print("\033[1;93m[3] Extract Emails\033[0m")
+print("\033[1;93m[4] Extract Phone Numbers\033[0m")
 print()
 
-# Get user input
 choice = input("Enter your choice: ")
-url = input("Enter the target website URL: ")
+url = input("\nEnter your target website URL: ")
+
+print("\n")
 
 if choice == "1":
     try:
         response = requests.get(url)
         if response.status_code == 200:
-            print("\033[92m[ Success ] Website is up\033[0m")
+            print("\033[92m✔ Website is Accessible\033[0m")
         else:
-            print("\033[91m[ Failed ] Website is down\033[0m")
+            print("\033[91m✘ Website returned error:\033[0m", response.status_code)
     except Exception as e:
-        print("\033[91m[ Failed ] Error: ", str(e), "\033[0m")
+        print("\033[91mError:\033[0m", e)
 
 elif choice == "2":
     try:
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
-        print("\033[92m[ Success ] Web scraping successful\033[0m")
-        print(soup.text)
+        print("\033[92m✔ Web Page Loaded\033[0m\n")
+        print(soup.text[:500])
     except Exception as e:
-        print("\033[91m[ Failed ] Error: ", str(e), "\033[0m")
+        print("\033[91mError:\033[0m", e)
 
 elif choice == "3":
     try:
         response = requests.get(url)
         emails = re.findall(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", response.text)
+
         if emails:
-            print("\033[92m[ Success ] Emails found\033[0m")
+            print("\033[92m✔ Emails Found:\033[0m")
             for email in emails:
                 print(email)
         else:
-            print("\033[91m[ Failed ] No emails found\033[0m")
+            print("\033[91m✘ No Emails Found\033[0m")
     except Exception as e:
-        print("\033[91m[ Failed ] Error: ", str(e), "\033[0m")
+        print("\033[91mError:\033[0m", e)
 
 elif choice == "4":
     try:
         response = requests.get(url)
-        numbers = re.findall(r'\d{3}[-\.\s]??\d{3}[-\.\s]??\d{4}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4}', response.text)
+        numbers = re.findall(r"\+?\d[\d\s\-]{6,15}", response.text)
+
         if numbers:
-            print("\033[92m[ Success ] Numbers found\033[0m")
+            print("\033[92m✔ Numbers Found:\033[0m")
             for number in numbers:
                 print(number)
         else:
-            print("\033[91m[ Failed ] No numbers found\033[0m")
+            print("\033[91m✘ No Numbers Found\033[0m")
     except Exception as e:
-        print("\033[91m[ Failed ] Error: ", str(e), "\033[0m")
+        print("\033[91mError:\033[0m", e)
 
 else:
-    print("\033[91m[ Failed ] Invalid choice\033[0m")
+    print("\033[91mInvalid Option!\033[0m")
