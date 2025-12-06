@@ -1,86 +1,215 @@
-import requests
-from bs4 import BeautifulSoup
-import re
-import os
+#!/usr/bin/env python3
+"""
+Gliter 3.0
+"""
 
-# Clear screen
-os.system('cls' if os.name == 'nt' else 'clear')
+import hashlib
+import random
+import time
+import sys
 
-# Colored Thick JP‑BRUTE ASCII Header
-print("\033[1;92m")  # Bold Green
-print("######################################################")
-print("#####   ######   ########   #####   #####   ##########")
-print("#####   ######   ########   #####   #####   ##   #####")
-print("#####   ##       ##         ## ##   ## ##   ##   #####")
-print("#####   ######   #######    ##  ##  ##  ##  ##########")
-print("#####   ##       ##         ##   ## ##   ## ##   ##  #")
-print("#####   ##       ##         ##    ####    ## ##    ## #")
-print("#####   ##       ########   ##     ##     ## ##     ###")
-print("######################################################")
-print("\033[0m")  # Reset color
+# ANSI colors
+PURPLE = "\033[95m"
+GREEN  = "\033[92m"
+CYAN   = "\033[96m"
+YELLOW = "\033[93m"
+RESET  = "\033[0m"
+BOLD   = "\033[1m"
 
-print("\033[1;94mCreator:\033[0m James Phillips")
-print("\033[1;94mStatus:\033[0m Free Project")
-print("\033[1;94mCreation Date:\033[0m December 4")
-print()
+def colored(text, color):
+    return f"{color}{text}{RESET}"
 
-print("\033[1;93m[1] Website Status (Ping)\033[0m")
-print("\033[1;93m[2] Web Page Text (Scrape)\033[0m")
-print("\033[1;93m[3] Extract Emails\033[0m")
-print("\033[1;93m[4] Extract Phone Numbers\033[0m")
-print()
+def glitter_title():
+    G = [
+        " ##### ",
+        "#     #",
+        "#      ",
+        "#  ### ",
+        "#    # ",
+        "#     #",
+        " ##### ",
+    ]
+    L = [
+        "#      ",
+        "#      ",
+        "#      ",
+        "#      ",
+        "#      ",
+        "#      ",
+        "###### ",
+    ]
+    I = [
+        "  ###  ",
+        "   #   ",
+        "   #   ",
+        "   #   ",
+        "   #   ",
+        "   #   ",
+        "  ###  ",
+    ]
+    T = [
+        "#######",
+        "   #   ",
+        "   #   ",
+        "   #   ",
+        "   #   ",
+        "   #   ",
+        "   #   ",
+    ]
+    E = [
+        "#######",
+        "#      ",
+        "#      ",
+        "#####  ",
+        "#      ",
+        "#      ",
+        "#######",
+    ]
+    R = [
+        "###### ",
+        "#     #",
+        "#     #",
+        "###### ",
+        "#  #   ",
+        "#   #  ",
+        "#    # ",
+    ]
+    rows = []
+    for i in range(7):
+        row = G[i] + "  " + L[i] + "  " + I[i] + "  " + T[i] + "  " + T[i] + "  " + E[i] + "  " + R[i]
+        rows.append(row)
+    return "\n".join(rows)
 
-choice = input("Enter your choice: ")
-url = input("\nEnter your target website URL: ")
+def seed_from(text):
+    h = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    return int(h[:16], 16)
 
-print("\n")
+def show_header():
+    print(colored(glitter_title(), PURPLE + BOLD))
+    print()
+    info = [
+        ("Creator", "hacker z"),
+        ("Status",  "running"),
+        ("Speed",   "5G"),
+    ]
+    max_label = max(len(lbl) for lbl, _ in info)
+    max_val = max(len(val) for _, val in info)
+    box_width = max_label + max_val + 7
+    top = "#" * box_width
+    print(colored(top, GREEN))
+    for lbl, val in info:
+        line = f"# {lbl.ljust(max_label)} : {val.ljust(max_val)} #"
+        print(colored(line, GREEN))
+    print(colored(top, GREEN))
+    print()
+    menu_line1 = "[1] Facebook   [2] Instagram"
+    menu_line2 = "[3] X (formerly Twitter)   [4] TikTok"
+    print(colored(menu_line1, CYAN + BOLD))
+    print(colored(menu_line2, CYAN + BOLD))
+    print()
 
-if choice == "1":
+def fake_profile_fields(seed_val, platform):
+    rnd = random.Random(seed_val)
+
+    # New: More “real” styled usernames
+    first_names = ["James", "Gloria", "Michael", "Stanley", "Sophia", "Daniel", "Kelvin", "Sandra", "Victor", "Janet"]
+    last_names  = ["Adams", "Okoro", "Hernandez", "Brown", "Adeyemi", "Stone", "Peters", "Martins", "Lee", "Johnson"]
+
+    uname = f"{first_names[rnd.randint(0,9)]}{last_names[rnd.randint(0,9)]}{rnd.randint(10,99)}"
+
+    pw_words = ["sun","blue","node","alpha","delta","neo","seed","orbit","echo"]
+    password = pw_words[rnd.randint(0, len(pw_words)-1)] + str(rnd.randint(10,999))
+
+    friends = f"{rnd.randint(1,9)}.{rnd.randint(0,9)}k" if rnd.random() < 0.6 else f"{rnd.randint(10,9999)}"
+    years = f"{rnd.randint(0,12)} years"
+    created_year = str(2010 + rnd.randint(0,15))
+    uid = rnd.randint(1000000,99999999)
+
+    bio_snippets = [
+        "Loves coffee and code",
+        "Collector of odd usernames",
+        "Occasional memer",
+        "Private profile",
+        "Active poster"
+    ]
+    bio = rnd.choice(bio_snippets)
+
+    return {
+        "Username": uname,
+        "Password": password,
+        "User friends": friends,
+        "Account years": years,
+        "Created": created_year,
+        "UID": str(uid),
+        "Bio": bio
+    }
+
+def print_fake_report(platform, target_input):
+    seed_val = seed_from(platform + "|" + target_input)
+    fields = fake_profile_fields(seed_val, platform)
+
+    heading = f"{platform.upper()} HACK"
+    print(colored("=" * max(20, len(heading)), YELLOW))
+    print(colored(heading.center(40), YELLOW + BOLD))
+    print(colored("=" * max(20, len(heading)), YELLOW))
+    print()
+
+    steps = ["Opening interface", "Scraping public metadata", "Assembling profile", "Rendering report"]
+    for s in steps:
+        sys.stdout.write(colored(f"[{s}] ", GREEN))
+        sys.stdout.flush()
+        time.sleep(0.18)
+        print(colored("OK", GREEN))
+    print()
+
+    idx = 0
+    for k, v in fields.items():
+        idx += 1
+        code = (seed_val >> (idx*4)) & 0xFFFFFFFF
+        print(colored(f"[ {k} ] = {code} = [ {v} ]", GREEN))
+    print()
+
+    print(colored("This output is generated locally and is for entertainment/educational use only.", CYAN))
+    print(colored("Do not enter real emails, phone numbers, passwords, or other sensitive information.", CYAN))
+    print()
+
+def platform_flow(choice):
+    mapping = {
+        "1": "Facebook",
+        "2": "Instagram",
+        "3": "X",
+        "4": "TikTok"
+    }
+    platform = mapping.get(choice)
+    if not platform:
+        print(colored("Invalid choice. Pick 1, 2, 3 or 4.", YELLOW))
+        return
+    print()
+    print(colored(f"--- {platform.upper()} CONSOLE ---", PURPLE))
+    print(colored("Enter target identifier (fictional only). Example: demo_user or sample_tag", CYAN))
+
+    target = input(colored("Target> ", GREEN)).strip()
+    if not target:
+        target = f"demo_{platform.lower()}"
+        print(colored(f"No input. Using fallback identifier: {target}", YELLOW))
+
+    print()
+    print_fake_report(platform, target)
+
+def main():
+    show_header()
+    print(colored("Which number do you want to input? (1-4)  Type q to quit.", CYAN))
+
+    while True:
+        choice = input(colored("Choice> ", GREEN)).strip().lower()
+        if choice in ("q", "quit", "exit"):
+            print(colored("Goodbye.", PURPLE))
+            break
+        platform_flow(choice)
+        print(colored("Back to menu. Choose another (1-4) or q to quit.", CYAN))
+
+if __name__ == "__main__":
     try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            print("\033[92m✔ Website is Accessible\033[0m")
-        else:
-            print("\033[91m✘ Website returned error:\033[0m", response.status_code)
-    except Exception as e:
-        print("\033[91mError:\033[0m", e)
-
-elif choice == "2":
-    try:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        print("\033[92m✔ Web Page Loaded\033[0m\n")
-        print(soup.text[:500])
-    except Exception as e:
-        print("\033[91mError:\033[0m", e)
-
-elif choice == "3":
-    try:
-        response = requests.get(url)
-        emails = re.findall(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+", response.text)
-
-        if emails:
-            print("\033[92m✔ Emails Found:\033[0m")
-            for email in emails:
-                print(email)
-        else:
-            print("\033[91m✘ No Emails Found\033[0m")
-    except Exception as e:
-        print("\033[91mError:\033[0m", e)
-
-elif choice == "4":
-    try:
-        response = requests.get(url)
-        numbers = re.findall(r"\+?\d[\d\s\-]{6,15}", response.text)
-
-        if numbers:
-            print("\033[92m✔ Numbers Found:\033[0m")
-            for number in numbers:
-                print(number)
-        else:
-            print("\033[91m✘ No Numbers Found\033[0m")
-    except Exception as e:
-        print("\033[91mError:\033[0m", e)
-
-else:
-    print("\033[91mInvalid Option!\033[0m")
+        main()
+    except KeyboardInterrupt:
+        print("\n" + colored("Interrupted. Exiting.", YELLOW))
