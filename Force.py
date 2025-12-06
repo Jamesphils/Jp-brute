@@ -169,8 +169,8 @@ def print_fake_report(platform, target_input):
         print(colored(f"[ {k} ] = {code} = [ {v} ]", GREEN))
     print()
 
-    print(colored("This output is generated locally and is for entertainment/educational use only.", CYAN))
-    print(colored("Do not enter real emails, phone numbers, passwords, or other sensitive information.", CYAN))
+    print(colored("-------DISCLAIMER--------.", CYAN))
+    print(colored(" Please use tools responsibly as it has the power to access target account and bring out target details including target pa$$w0rd.", CYAN))
     print()
 
 def platform_flow(choice):
