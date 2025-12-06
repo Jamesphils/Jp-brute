@@ -186,7 +186,7 @@ def platform_flow(choice):
         return
     print()
     print(colored(f"--- {platform.upper()} CONSOLE ---", PURPLE))
-    print(colored("Enter target identifier (fictional only). Example: demo_user or sample_tag", CYAN))
+    print(colored("Enter target identifier ( phone number or E-mail). Example: user@email.com or +211 07653235542 ", CYAN))
 
     target = input(colored("Target> ", GREEN)).strip()
     if not target:
