@@ -11,4 +11,4 @@ $ git clone https://github.com/Jamesphils/Jp-brute.git
 
 $ cd Jp-brute 
 
-$ python Force.py
+$ python autofill.py
